@@ -3,9 +3,9 @@
 
 Library to add consistent checks on application health
 
-== Modules ==
+## Modules
 
-=== core ===
+### core
 
 contains core functionality 
 
@@ -34,7 +34,7 @@ def checkDb():(String) => Future[Result] =
         }   
 ```
 
-=== akka_http_spray_json ===
+### akka_http_spray_json
 
 uses the core module
 
@@ -44,6 +44,6 @@ Routes for `/status` and `/heartbeat`
     def routes: Route = normalRoutes ++ statusRoutes(checks) 
 ```
 
-=== other combinations of servers and json serializers ===
+### other combinations of servers and json serializers
 
 coming soon
