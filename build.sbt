@@ -32,6 +32,7 @@ lazy val akka_http_spray_json = project
 
 lazy val example = project
   .dependsOn(core)
+  .dependsOn(akka_http_spray_json)
   .settings(commonSettings: _*)
   .settings(
     mainClass in Compile := Some("com.newmotion.devops.Main"),
