@@ -17,7 +17,7 @@ trait StatusJsonProtocol extends SprayJsonSupport with DefaultJsonProtocol {
 
   implicit val resultJF: RootJsonFormat[Result] = jsonFormat2(Result)
   implicit val extendedResultJF: RootJsonFormat[ExtendedResult] = jsonFormat3(ExtendedResult)
-  implicit val resultsJF: RootJsonFormat[Results] = jsonFormat3(Results)
+  implicit val resultsJF: RootJsonFormat[Results] = jsonFormat4(Results)
 
 }
 

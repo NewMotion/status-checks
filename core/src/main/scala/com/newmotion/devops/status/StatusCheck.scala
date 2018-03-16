@@ -5,7 +5,7 @@ import scala.concurrent.Future
 
 case class Result(status:Boolean, data:Map[String, String] = Map())
 case class ExtendedResult(name:String, importance: Importance, result: Result)
-case class Results(name: String, internals: Seq[ExtendedResult], externals: Seq[ExtendedResult])
+case class Results(name: String, status: Boolean, internals: Seq[ExtendedResult], externals: Seq[ExtendedResult])
 
 sealed trait Importance
 object Importance {
@@ -82,10 +82,12 @@ trait StatusCheck {
       //TODO these are run sequential, refactor so all Futures run in parallel
       for {
         int <- Future.traverse(internals)((x) => x._2().recover{ case e => recoverResult(e) }
-          .map(ExtendedResult(x._1._1,x._1._2, _))).map(r => r.toSeq)
+                      .map(ExtendedResult(x._1._1,x._1._2, _))).map(r => r.toSeq)
         ext <- Future.traverse(externals)((x) => x._2().recover{ case e => recoverResult(e) }
-          .map(ExtendedResult(x._1._1,x._1._2, _))).map(r => r.toSeq)
-      } yield Results(id, int, ext)
+                      .map(ExtendedResult(x._1._1,x._1._2, _))).map(r => r.toSeq)
+        status <- Future((int.map(_.result.status) ++ ext.map(_.result.status)).reduce(_ && _))
+      } yield Results(id, status, int, ext)
+
 
     }
   }

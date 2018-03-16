@@ -21,11 +21,11 @@ class StatusRouteSpec extends WordSpec with Matchers with ScalatestRouteTest wit
     }
 
     "return a Result for a single check" in {
-      val singleCheck = Checks("single_check").internal("me", Importance.Critical, () => Future(Result(true,Map())))
+      val singleCheck = Checks("single_check").internal("me", Importance.Critical, () => Future(Result(status = true,Map())))
 
       Get("/status") ~> StatusRoutes.statusRoute(singleCheck) ~> check {
         response.status shouldEqual StatusCodes.OK
-        responseAs[Results] shouldEqual Results("single_check", Seq(ExtendedResult("me", Importance.Critical, Result(true, Map()))), Seq())
+        responseAs[Results] shouldEqual Results("single_check", status = true, Seq(ExtendedResult("me", Importance.Critical, Result(status = true, Map()))), Seq())
       }
     }
 
@@ -34,22 +34,22 @@ class StatusRouteSpec extends WordSpec with Matchers with ScalatestRouteTest wit
 
       Get("/status") ~> StatusRoutes.statusRoute(exceptionCheck) ~> check {
         response.status shouldEqual StatusCodes.OK
-        responseAs[Results] shouldEqual Results("exception_check", Seq(ExtendedResult("me", Importance.Major, Result(false, Map("exception" -> "bla")))), Seq())
+        responseAs[Results] shouldEqual Results("exception_check", status = false, Seq(ExtendedResult("me", Importance.Major, Result(status = false, Map("exception" -> "bla")))), Seq())
       }
     }
 
     "return a Result when there are two checks" in {
       val twoChecks = Checks("two_checks")
-                        .internal("one", Importance.Major, () => Future(Result(true,Map())))
-                        .external("two", Importance.Critical, () => Future(Result(true,Map("response_time"->"0.040"))))
+                        .internal("one", Importance.Major, () => Future(Result(status = true,Map())))
+                        .external("two", Importance.Critical, () => Future(Result(status = true,Map("response_time"->"0.040"))))
 
       Get("/status") ~> StatusRoutes.statusRoute(twoChecks) ~> check {
         println(responseAs[String])
         response.status shouldEqual StatusCodes.OK
         responseAs[Results] shouldEqual Results(
-                                          "two_checks",
-                                          Seq(ExtendedResult("one", Importance.Major, Result(true, Map()))),
-                                          Seq(ExtendedResult("two", Importance.Critical, Result(true, Map("response_time"->"0.040"))))
+                                          "two_checks", status = true,
+                                          Seq(ExtendedResult("one", Importance.Major, Result(status = true, Map()))),
+                                          Seq(ExtendedResult("two", Importance.Critical, Result(status = true, Map("response_time"->"0.040"))))
                                         )
       }
     }
